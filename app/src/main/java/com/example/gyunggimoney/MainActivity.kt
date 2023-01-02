@@ -2,19 +2,23 @@ package com.example.gyunggimoney
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.example.gyunggimoney.databinding.ActivityMainBinding
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import org.json.JSONObject
@@ -23,13 +27,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels { MainViewModelFactory(Repository()) }
     private var mBackWait: Long = 0
-    private val storeList = mutableListOf<Store>()
-    private val recyclerViewAdapter = RecyclerViewAdapter(storeList)
+    private var storeList = mutableListOf<Store>()
+    private var recyclerViewAdapter = RecyclerViewAdapter(storeList)
     private lateinit var dialog: LoadingDialog
     private var mInterstitialAd: InterstitialAd? = null
 
-
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -43,8 +46,9 @@ class MainActivity : AppCompatActivity() {
         MobileAds.initialize(this)
         binding.adView.loadAd(AdRequest.Builder().build())
 
-        val adRequest = AdRequest.Builder().build()
+        binding.recyclerview.adapter = recyclerViewAdapter
 
+        val adRequest = AdRequest.Builder().build()
 
         mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
@@ -56,10 +60,6 @@ class MainActivity : AppCompatActivity() {
                 mInterstitialAd = null
             }
         }
-
-
-        binding.recyclerview.setHasFixedSize(true)
-        binding.recyclerview.adapter = recyclerViewAdapter
 
         val spLocationPosition: Int = SharedPreferencesManager.getInt(this, "location", 0)
         binding.siGunGu.setSelection(spLocationPosition)
@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity() {
                     id: Long
                 ) {
                     mainViewModel.spinnerItem.value = siGunGu.selectedItem.toString()
-
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -82,15 +81,16 @@ class MainActivity : AppCompatActivity() {
             }
 
             saveBtn.setOnClickListener {
-
-                checkBoxChecked(siGunGu.selectedItemPosition)
-                getSoreList(dialog)
-                storeList.clear()
-            }
-
-            binding.swipeRefresh.setOnRefreshListener {
-                binding.swipeRefresh.isRefreshing = false
-                getSoreList(dialog)
+                if (!NetworkStateManager.checkNetworkState(this@MainActivity)) {
+                    Log.d("networkState", "not access to Network")
+                    Toast.makeText(this@MainActivity, "데이터 연결 상태를 확인해주세요", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    checkBoxChecked(siGunGu.selectedItemPosition)
+                    getSoreList(dialog)
+                    searchEdit.text.clear()
+                    storeList.clear()
+                }
             }
 
             recyclerViewAdapter.setItemClickListener(object :
@@ -98,12 +98,12 @@ class MainActivity : AppCompatActivity() {
                 override fun onClick(v: View, position: Int) {
                     InterstitialAd.load(
                         this@MainActivity,
-                        "ca-app-pub-3940256099942544/1033173712",
+                        BuildConfig.AD_API_KEY,
                         adRequest,
                         object : InterstitialAdLoadCallback() {
                             override fun onAdFailedToLoad(adError: LoadAdError) {
                                 mInterstitialAd = null
-                                Log.d("fullAdError",adError.toString())
+                                Log.d("fullAdError", adError.toString())
                             }
 
                             override fun onAdLoaded(interstitialAd: InterstitialAd) {
@@ -111,12 +111,44 @@ class MainActivity : AppCompatActivity() {
                                 interstitialAd.show(this@MainActivity)
                             }
                         })
-
                     val intent = Intent(this@MainActivity, DetailStoreActivity::class.java)
-                    intent.putExtra("longitude", storeList[position].longitude)
-                    intent.putExtra("latitude", storeList[position].latitude)
-                    intent.putExtra("storeName", storeList[position].storeName)
+                    intent.putExtra(
+                        "longitude",
+                        recyclerViewAdapter.storeList!![position].longitude
+                    )
+                    intent.putExtra("latitude", recyclerViewAdapter.storeList!![position].latitude)
+                    intent.putExtra(
+                        "storeName",
+                        recyclerViewAdapter.storeList!![position].storeName
+                    )
                     startActivity(intent)
+                }
+            })
+
+            searchEdit.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                    try {
+                        recyclerViewAdapter.filter.filter(s.toString())
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "오류가 발생하였습니다 다시 시도해주세요.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             })
         }
