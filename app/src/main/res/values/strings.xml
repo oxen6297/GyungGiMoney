@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">GyungGiMoney</string>
+    <string name="app_name">경기 지역화폐 가맹점 커넥트</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="adKey">ca-app-pub-8591703940724669/8258676115</string>
+    <string name="checkBoxInfoText">지역 정보 저장</string>checkBoxInfoText
+    <string name="clickInfoText">클릭시 가맹점 위치를 지도로 확인 가능</string>
+    <string name="gyungGi">경기도</string>
+    <string name="load">불러오기</string>
+    <string name="goTop">맨위로</string>
+    <string name="editHint">제목 또는 주소로 검색해주세요.</string>
+    <string name="splashText">경기지역 화폐 가맹점 찾기\n 커넥트</string>
 </resources>

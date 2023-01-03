@@ -8,14 +8,15 @@
 
         <variable
             name="vm"
-            type="com.example.gyunggimoney.MainViewModel" />
+            type="gyunggi.money.gyunggimoney.MainViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:background="@color/white"
+        tools:context="gyunggi.money.gyunggimoney.MainActivity">
 
         <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"
@@ -25,7 +26,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+            ads:adUnitId="@string/adKey"
             ads:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -45,19 +46,22 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/search_background"
-                android:hint="제목 또는 주소로 검색."
+                android:hint="@string/editHint"
                 android:paddingStart="25dp"
                 android:textSize="13dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="RtlSymmetry" />
 
-            <Button
+            <TextView
                 android:id="@+id/shop_search_btn"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/search_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13dp"
+                android:padding="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="X"
                 app:layout_constraintBottom_toBottomOf="@+id/search_edit"
                 app:layout_constraintEnd_toEndOf="@+id/search_edit"
                 app:layout_constraintTop_toTopOf="@+id/search_edit" />
@@ -67,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="경기도"
+                android:text="@string/gyungGi"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="normal"
@@ -89,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_background"
-                android:text="불러오기"
+                android:text="@string/load"
                 android:textColor="@color/white"
                 android:textSize="13dp"
                 android:textStyle="bold"
@@ -108,8 +112,8 @@
                 android:id="@+id/check_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="지역 정보 저장"
-                android:textSize="12dp"
+                android:text="@string/checkBoxInfoText"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@id/save_check_box"
                 app:layout_constraintStart_toEndOf="@id/save_check_box"
                 app:layout_constraintTop_toTopOf="@id/save_check_box" />
@@ -119,8 +123,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="클릭시 가맹점 위치를 지도로 확인 가능"
-                android:textSize="12dp"
+                android:text="@string/clickInfoText"
+                android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@id/save_check_box"
                 app:layout_constraintTop_toBottomOf="@+id/save_check_box" />
 
@@ -140,9 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="23dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@+id/save_check_box"
-                app:reverseLayout="false" />
+                app:layout_constraintTop_toBottomOf="@+id/save_check_box" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -152,9 +154,10 @@
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
             android:onClick="@{()->vm.scrollTop(recyclerview)}"
-            android:text="맨위로"
+            android:text="@string/goTop"
             android:textColor="@color/black"
             android:textSize="13dp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
